@@ -1,17 +1,17 @@
 {
-  "name": "hardhat-ts-plugin-boilerplate",
-  "version": "0.0.1",
-  "description": "Hardhat TypeScript plugin boilerplate",
-  "repository": "github:nomiclabs/hardhat-ts-plugin-boilerplate",
-  "author": "Nomic Labs LLC",
+  "name": "hardhat-noir",
+  "version": "0.1.0",
+  "description": "Hardhat plugin for Aztec Noir",
+  "repository": "github:spalladino/aztec-noir",
+  "author": "Santiago Palladino <spalladino@gmail.com>",
   "license": "MIT",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "keywords": [
     "ethereum",
-    "smart-contracts",
     "hardhat",
-    "hardhat-plugin"
+    "noir",
+    "aztec"
   ],
   "scripts": {
     "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
@@ -44,5 +44,9 @@
   },
   "peerDependencies": {
     "hardhat": "^2.0.0"
+  },
+  "dependencies": {
+    "@noir-lang/barretenberg": "^2.19.0",
+    "@noir-lang/noir_wasm": "^0.10.0"
   }
 }

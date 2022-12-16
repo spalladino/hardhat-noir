@@ -1,49 +1,57 @@
-import { extendConfig, extendEnvironment } from "hardhat/config";
+import { TASK_COMPILE_GET_COMPILATION_TASKS } from "hardhat/builtin-tasks/task-names";
+import { extendConfig, extendEnvironment, subtask } from "hardhat/config";
 import { lazyObject } from "hardhat/plugins";
-import { HardhatConfig, HardhatUserConfig } from "hardhat/types";
-import path from "path";
+import { HardhatConfig, HardhatUserConfig, TaskArguments } from "hardhat/types";
+import { isAbsolute, join, normalize } from "path";
 
-import { ExampleHardhatRuntimeEnvironmentField } from "./ExampleHardhatRuntimeEnvironmentField";
-// This import is needed to let the TypeScript compiler know that it should include your type
-// extensions in your npm package's types file.
+import { compileNoir } from "./compile";
+import { NoirField } from "./noir";
 import "./type-extensions";
+
+export const TASK_COMPILE_NOIR = "compile:noir";
+
+function getPath(rootPath: string, defaultPath: string, userPath?: string) {
+  if (userPath === undefined) {
+    return join(rootPath, defaultPath);
+  } else if (isAbsolute(userPath)) {
+    return userPath;
+  } else {
+    return normalize(join(rootPath, userPath));
+  }
+}
 
 extendConfig(
   (config: HardhatConfig, userConfig: Readonly<HardhatUserConfig>) => {
-    // We apply our default config here. Any other kind of config resolution
-    // or normalization should be placed here.
-    //
-    // `config` is the resolved config, which will be used during runtime and
-    // you should modify.
-    // `userConfig` is the config as provided by the user. You should not modify
-    // it.
-    //
-    // If you extended the `HardhatConfig` type, you need to make sure that
-    // executing this function ensures that the `config` object is in a valid
-    // state for its type, including its extensions. For example, you may
-    // need to apply a default value, like in this example.
-    const userPath = userConfig.paths?.newPath;
+    const noir = config.noir || {};
+    config.noir = noir;
 
-    let newPath: string;
-    if (userPath === undefined) {
-      newPath = path.join(config.paths.root, "newPath");
-    } else {
-      if (path.isAbsolute(userPath)) {
-        newPath = userPath;
-      } else {
-        // We resolve relative paths starting from the project's root.
-        // Please keep this convention to avoid confusion.
-        newPath = path.normalize(path.join(config.paths.root, userPath));
-      }
-    }
-
-    config.paths.newPath = newPath;
+    noir.circuitsPath = getPath(
+      config.paths.root,
+      "circuits",
+      userConfig.noir?.circuitsPath
+    );
+    noir.mainCircuitName = userConfig.noir?.mainCircuitName ?? "main";
+    noir.nargoBin = userConfig.noir?.nargoBin ?? "nargo";
+    noir.autoCompile = userConfig.noir?.autoCompile ?? true;
   }
 );
 
 extendEnvironment((hre) => {
-  // We add a field to the Hardhat Runtime Environment here.
-  // We use lazyObject to avoid initializing things until they are actually
-  // needed.
-  hre.example = lazyObject(() => new ExampleHardhatRuntimeEnvironmentField());
+  hre.noir = lazyObject(() => new NoirField(hre));
 });
+
+subtask(
+  TASK_COMPILE_GET_COMPILATION_TASKS,
+  async (args: TaskArguments, hre, runSuper): Promise<string[]> => {
+    const otherTasks: string[] = await runSuper(args);
+    const noirTasks = hre.config.noir.autoCompile ? [TASK_COMPILE_NOIR] : [];
+    return [...noirTasks, ...otherTasks];
+  }
+);
+
+subtask(
+  TASK_COMPILE_NOIR,
+  async (args: { quiet: boolean }, hre): Promise<void> => {
+    await compileNoir(hre, args);
+  }
+);

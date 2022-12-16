@@ -1,46 +1,71 @@
 // tslint:disable-next-line no-implicit-dependencies
 import { assert } from "chai";
-import path from "path";
-
-import { ExampleHardhatRuntimeEnvironmentField } from "../src/ExampleHardhatRuntimeEnvironmentField";
+import { existsSync, unlinkSync } from "fs";
+import { resolve } from "path";
 
 import { useEnvironment } from "./helpers";
 
-describe("Integration tests examples", function () {
-  describe("Hardhat Runtime Environment extension", function () {
+const artifactPath = resolve(
+  __dirname,
+  `fixture-projects/hardhat-project/noir/build/mul.acir`
+);
+
+describe("tasks", function () {
+  describe("compile", function () {
     useEnvironment("hardhat-project");
 
-    it("Should add the example field", function () {
-      assert.instanceOf(
-        this.hre.example,
-        ExampleHardhatRuntimeEnvironmentField
-      );
+    beforeEach(function () {
+      if (existsSync(artifactPath)) {
+        unlinkSync(artifactPath);
+      }
     });
 
-    it("The example field should say hello", function () {
-      assert.equal(this.hre.example.sayHello(), "hello");
+    it("compiles circuit", async function () {
+      await this.hre.run("compile:noir", { quiet: true });
+      assert.isTrue(existsSync(artifactPath));
     });
-  });
 
-  describe("HardhatConfig extension", function () {
-    useEnvironment("hardhat-project");
-
-    it("Should add the newPath to the config", function () {
-      assert.equal(
-        this.hre.config.paths.newPath,
-        path.join(process.cwd(), "asd")
-      );
+    it("compiles circuit when compiling contracts", async function () {
+      await this.hre.run("compile", { quiet: true });
+      assert.isTrue(existsSync(artifactPath));
     });
   });
 });
 
-describe("Unit tests examples", function () {
-  describe("ExampleHardhatRuntimeEnvironmentField", function () {
-    describe("sayHello", function () {
-      it("Should say hello", function () {
-        const field = new ExampleHardhatRuntimeEnvironmentField();
-        assert.equal(field.sayHello(), "hello");
-      });
+describe("hre", function () {
+  describe("circuit", function () {
+    useEnvironment("hardhat-project");
+
+    beforeEach(async function () {
+      if (!existsSync(artifactPath)) {
+        await this.hre.run("compile:noir", { quiet: true });
+      }
+    });
+
+    it("gets the default compiled circuit", async function () {
+      const circuit = this.hre.noir.getCircuit();
+      assert.exists(circuit.getACIR());
+    });
+
+    it("fails to get non existing circuit", async function () {
+      assert.throws(() => this.hre.noir.getCircuit("not-exists"));
+    });
+
+    it("gets and verifies a valid proof for the circuit", async function () {
+      const circuit = this.hre.noir.getCircuit();
+      const proof = await circuit.getProof({ x: 2, y: 3, result: 6 });
+      assert.isTrue(await circuit.verifyProof(proof));
+    });
+
+    it("gets and verifies a valid proof for the circuit via shorthand", async function () {
+      const circuit = this.hre.noir.getCircuit();
+      assert.isTrue(await circuit.verifyProofFor({ x: 2, y: 3, result: 6 }));
+    });
+
+    it("fails to verify invalid proof", async function () {
+      const circuit = this.hre.noir.getCircuit();
+      const proof = await circuit.getProof({ x: 2, y: 3, result: 5 });
+      assert.isFalse(await circuit.verifyProof(proof));
     });
   });
 });

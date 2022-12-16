@@ -1,13 +1,11 @@
-// We load the plugin here.
 import { HardhatUserConfig } from "hardhat/types";
 
-import "../../../src/index";
+import "../src/index";
 
 const config: HardhatUserConfig = {
-  solidity: "0.7.3",
+  solidity: "0.8.17",
   defaultNetwork: "hardhat",
   noir: {
-    circuitsPath: "noir",
     mainCircuitName: "mul",
   },
 };
