@@ -28,6 +28,8 @@
     ],
     "no-floating-promises": true,
     "prefer-conditional-expression": false,
-    "no-implicit-dependencies": false
+    "no-implicit-dependencies": false,
+    "curly": [true, "ignore-same-line"],
+    "max-line-length": [true, 120]
   }
 }

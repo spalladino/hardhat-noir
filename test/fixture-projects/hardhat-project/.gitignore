@@ -1,2 +1,4 @@
 /cache
 /noir/build
+/artifacts
+/contracts/*Verifier.sol

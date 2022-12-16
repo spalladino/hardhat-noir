@@ -3,4 +3,5 @@ export interface NoirConfig {
   mainCircuitName: string;
   nargoBin: string;
   autoCompile: boolean;
+  autoGenerateContract: boolean;
 }
