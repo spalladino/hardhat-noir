@@ -8,6 +8,11 @@ import "./type-extensions";
 export class NoirField {
   constructor(private hre: HardhatRuntimeEnvironment) {}
 
+  /**
+   * Returns an already-compiled Circuit object from an .acir file
+   * @param name name of the ACIR file (without extension) in the build folder, defaults to config.noir.mainCircuitName
+   * @returns a Circuit object initialized with the ACIR
+   */
   public getCircuit(name?: string): Circuit {
     const circuitName = name ?? this.hre.config.noir.mainCircuitName;
     const path = pathJoin(
