@@ -5,7 +5,7 @@ import { join as pathJoin } from "path";
 import { Circuit, loadCircuit } from "./circuit";
 import "./type-extensions";
 
-export class NoirField {
+export class Noir {
   constructor(private hre: HardhatRuntimeEnvironment) {}
 
   /**

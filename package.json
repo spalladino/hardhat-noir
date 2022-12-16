@@ -30,6 +30,8 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/fs-extra": "^5.0.4",
+    "@types/glob": "^8.0.0",
+    "@types/lodash": "^4.14.191",
     "@types/mocha": "^5.2.6",
     "@types/node": "^8.10.38",
     "chai": "^4.2.0",
@@ -47,6 +49,8 @@
   },
   "dependencies": {
     "@noir-lang/barretenberg": "^2.19.0",
-    "@noir-lang/noir_wasm": "^0.10.0"
+    "@noir-lang/noir_wasm": "^0.10.0",
+    "glob": "^8.0.3",
+    "lodash": "^4.17.21"
   }
 }

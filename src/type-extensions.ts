@@ -2,7 +2,7 @@ import "hardhat/types/config";
 import "hardhat/types/runtime";
 
 import { NoirConfig } from "./config";
-import { NoirField } from "./noir";
+import { Noir } from "./noir";
 
 declare module "hardhat/types/config" {
   export interface HardhatUserConfig {
@@ -16,6 +16,6 @@ declare module "hardhat/types/config" {
 
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
-    noir: NoirField;
+    noir: Noir;
   }
 }

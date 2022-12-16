@@ -1,6 +1,6 @@
 // tslint:disable-next-line no-implicit-dependencies
 import { assert } from "chai";
-import { existsSync, unlinkSync } from "fs";
+import { existsSync, unlinkSync, statSync, utimesSync } from "fs";
 import { resolve } from "path";
 
 import { useEnvironment } from "./helpers";
@@ -10,7 +10,12 @@ const artifactPath = resolve(
   `fixture-projects/hardhat-project/noir/build/mul.acir`
 );
 
-describe("tasks", function () {
+const circuitSourcePath = resolve(
+  __dirname,
+  `fixture-projects/hardhat-project/noir/src/main.nr`
+);
+
+describe.only("tasks", function () {
   describe("compile", function () {
     useEnvironment("hardhat-project");
 
@@ -28,6 +33,32 @@ describe("tasks", function () {
     it("compiles circuit when compiling contracts", async function () {
       await this.hre.run("compile", { quiet: true });
       assert.isTrue(existsSync(artifactPath));
+    });
+
+    it("does not recompile if no changes to sources", async function () {
+      await this.hre.run("compile:noir", { quiet: true });
+      const artifactMtime = statSync(artifactPath).mtimeMs;
+      await this.hre.run("compile:noir", { quiet: true });
+      const newArtifactMtime = statSync(artifactPath).mtimeMs;
+      assert.equal(newArtifactMtime, artifactMtime);
+    });
+
+    it("recompiles if sources changed", async function () {
+      await this.hre.run("compile:noir", { quiet: true });
+      const artifactMtime = statSync(artifactPath).mtimeMs;
+      const now = new Date();
+      utimesSync(circuitSourcePath, now, now);
+      await this.hre.run("compile:noir", { quiet: true });
+      const newArtifactMtime = statSync(artifactPath).mtimeMs;
+      assert.isAbove(newArtifactMtime, artifactMtime);
+    });
+
+    it("recompiles if forced", async function () {
+      await this.hre.run("compile:noir", { quiet: true });
+      const artifactMtime = statSync(artifactPath).mtimeMs;
+      await this.hre.run("compile:noir", { quiet: true, force: true });
+      const newArtifactMtime = statSync(artifactPath).mtimeMs;
+      assert.isAbove(newArtifactMtime, artifactMtime);
     });
   });
 });

@@ -1,14 +1,17 @@
 import { TASK_COMPILE_GET_COMPILATION_TASKS } from "hardhat/builtin-tasks/task-names";
-import { extendConfig, extendEnvironment, subtask } from "hardhat/config";
+import { extendConfig, extendEnvironment, subtask, task } from "hardhat/config";
 import { lazyObject } from "hardhat/plugins";
-import { HardhatConfig, HardhatUserConfig, TaskArguments } from "hardhat/types";
+import { HardhatConfig, HardhatRuntimeEnvironment as HRE, HardhatUserConfig, TaskArguments } from "hardhat/types";
 import { isAbsolute, join, normalize } from "path";
 
-import { compileNoir } from "./compile";
-import { NoirField } from "./noir";
+import { compileNoir, CompileNoirTaskArgs, needsCompileNoir } from "./compile";
+import { Noir } from "./noir";
 import "./type-extensions";
 
 export const TASK_COMPILE_NOIR = "compile:noir";
+
+// Just to be friendly with the user in case they input it the other way around
+export const TASK_COMPILE_NOIR_REVERSE = "noir:compile";
 
 function getPath(rootPath: string, defaultPath: string, userPath?: string) {
   if (userPath === undefined) {
@@ -37,7 +40,7 @@ extendConfig(
 );
 
 extendEnvironment((hre) => {
-  hre.noir = lazyObject(() => new NoirField(hre));
+  hre.noir = lazyObject(() => new Noir(hre));
 });
 
 subtask(
@@ -49,9 +52,13 @@ subtask(
   }
 );
 
-subtask(
-  TASK_COMPILE_NOIR,
-  async (args: { quiet: boolean }, hre): Promise<void> => {
+const compileTask = async (args: CompileNoirTaskArgs, hre: HRE): Promise<void> => {
+  if (args.force || await needsCompileNoir(hre)) {
     await compileNoir(hre, args);
+  } else if (!args.quiet) {
+    console.error(`All circuits are up to date`);
   }
-);
+};
+
+task(TASK_COMPILE_NOIR, compileTask);
+task(TASK_COMPILE_NOIR_REVERSE, compileTask);
