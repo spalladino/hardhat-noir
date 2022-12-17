@@ -12,9 +12,8 @@ This plugin adds convenience methods to the Hardhat Runtime Environment for gene
 import { noir } from "hardhat";
 
 it("verifies proof for mul", async function () {
-  const circuit = noir.getCircuit();
   const input = { x: 3, y: 4, result: 12 };
-  expect(await circuit.verifyProofFor(input)).to.be.true;
+  expect(await noir.getCircuit().verifyProofFor(input)).to.be.true;
 });
 ```
 
@@ -63,7 +62,7 @@ These tasks only run if there are no changes detected so circuit source files, o
 - `noir:compile`: Compiles the circuit in the `circuitsPath` using `nargo`.
 - `noir:contract`: Generates a verifier contract for the circuit using `nargo` in Hardhat's contracts folder.
 
-> :info: The solidity pragma of the generated contract is automatically changed from `>=0.6.0 <0.8.0` to `>=0.6.0 <0.9.0` to support the latest versions of solc, since the generated verifier is compatible with the 0.8 releases.
+> :wink: The solidity pragma of the generated contract is automatically changed from `>=0.6.0 <0.8.0` to `>=0.6.0 <0.9.0` to support the latest versions of solc, since the generated verifier is compatible with the 0.8 releases.
 
 ## Environment extensions
 
