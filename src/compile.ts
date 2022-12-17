@@ -23,16 +23,16 @@ export async function needsCompileNoir(hre: HRE): Promise<boolean> {
 }
 
 export async function compileNoir(hre: HRE, args: CompileNoirTaskArgs) {
-  const { quiet } = args;
   const {
     nargoBin,
     mainCircuitName: circuitName,
     circuitsPath,
   } = hre.config.noir;
-  if (!quiet) console.error(`Compiling circuit ${circuitName} with nargo...`);
+  log(args, `Compiling circuit ${circuitName} with nargo...`);
 
-  const stdio = quiet ? "ignore" : "inherit";
+  const stdio = args.quiet ? "ignore" : "inherit";
   execSync(`${nargoBin} compile ${circuitName}`, { cwd: circuitsPath, stdio });
+  log(args, "");
 }
 
 export async function needsGenerateContract(hre: HRE): Promise<boolean> {
@@ -47,7 +47,6 @@ export async function generateVerifierContract(
   hre: HRE,
   args: CompileNoirTaskArgs
 ) {
-  const { quiet } = args;
   const {
     nargoBin,
     mainCircuitName: circuitName,
@@ -56,14 +55,10 @@ export async function generateVerifierContract(
   const contractName = `${upperFirst(camelCase(circuitName))}Verifier.sol`;
   const contractPath = getVerifierContractPath(hre);
 
-  if (!quiet) {
-    console.error(
-      `Generating verifier contract for ${circuitName} with nargo...`
-    );
-  }
+  log(args, `Generating verifier contract for ${circuitName} with nargo...`);
 
   // Call nargo to create the verifier contract
-  const stdio = quiet ? "ignore" : "inherit";
+  const stdio = args.quiet ? "ignore" : "inherit";
   execSync(`${nargoBin} contract`, { cwd: circuitsPath, stdio });
 
   // Move the contract to the user contracts folder, renamed as CircuitVerifier.sol
@@ -83,11 +78,7 @@ export async function generateVerifierContract(
       )
   );
 
-  if (!quiet) {
-    console.error(
-      `Moved verifier contract to ${contractName} in contracts folder`
-    );
-  }
+  log(args, `Moved verifier contract to ${contractName} in contracts folder\n`);
 }
 
 function getVerifierContractPath(hre: HRE) {
@@ -103,4 +94,8 @@ async function getMaxMTime(pattern: string): Promise<number | undefined> {
     files.map((f) => promisify(stat)(f).then((s) => s.mtimeMs))
   );
   return max(mtimes);
+}
+
+function log(args: Pick<CompileNoirTaskArgs, "quiet">, str: string) {
+  if (!args.quiet) console.error(str);
 }
