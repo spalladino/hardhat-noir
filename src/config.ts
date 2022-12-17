@@ -4,7 +4,7 @@ export interface NoirConfig {
    */
   circuitsPath: string;
   /**
-   * Name of the main circuit, used to generate the acir build artifact and 
+   * Name of the main circuit, used to generate the acir build artifact and
    * verifier contract (defaults to main).
    */
   mainCircuitName: string;
