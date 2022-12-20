@@ -63,7 +63,7 @@ export class Circuit {
     return this.verifyProof(proof);
   }
 
-  protected async getProverAndVerifier(): Promise<
+  public async getProverAndVerifier(): Promise<
     [StandardExampleProver, StandardExampleVerifier]
   > {
     if (!this.prover || !this.verifier) {

@@ -9,6 +9,11 @@ export interface NoirConfig {
    */
   mainCircuitName: string;
   /**
+   * Whether to use nargo, as opposed to wasm libraries, for compilation
+   * and for generating the verifier contract (defaults to false).
+   */
+  useNargo: boolean;
+  /**
    * Path to the nargo binary (defaults to nargo).
    */
   nargoBin: string;

@@ -27,8 +27,16 @@ describe("tasks", function () {
   });
 
   describe("noir:compile", function () {
-    it("compiles circuit", async function () {
+    it("compiles valid circuit with wasm", async function () {
+      this.hre.config.noir.useNargo = false;
       await this.hre.run("noir:compile", { quiet: true });
+      assert.isTrue(existsSync(artifactPath));
+      const circuit = this.hre.noir.getCircuit();
+      assert.isTrue(await circuit.verifyProofFor({ x: 2, y: 3, result: 6 }));
+    });
+
+    it("compiles circuit with nargo", async function () {
+      await this.hre.run("noir:compile", { quiet: true, nargo: true });
       assert.isTrue(existsSync(artifactPath));
     });
 
@@ -65,7 +73,17 @@ describe("tasks", function () {
   });
 
   describe("noir:contract", function () {
-    it("generates contract with nicer pragma", async function () {
+    it("generates contract with wasm", async function () {
+      this.hre.config.noir.useNargo = false;
+      await this.hre.run("noir:compile", { quiet: true });
+      await this.hre.run("noir:contract", { quiet: true });
+      assert.isTrue(existsSync(verifierPath));
+      const content = readFileSync(verifierPath).toString();
+      assert.include(content, `pragma solidity >=0.6.0`);
+      assert.notInclude(content, `pragma solidity >=0.6.0 <0.8.0`);
+    });
+
+    it("generates contract with nargo", async function () {
       await this.hre.run("noir:contract", { quiet: true });
       assert.isTrue(existsSync(verifierPath));
       const content = readFileSync(verifierPath).toString();

@@ -12,6 +12,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   noir: {
     mainCircuitName: "mul",
+    useNargo: false,
   },
 };
 

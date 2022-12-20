@@ -35,11 +35,6 @@ describe("hre", function () {
       assert.isTrue(await circuit.verifyProof(proof));
     });
 
-    it("gets and verifies a valid proof for the circuit via shorthand", async function () {
-      const circuit = this.hre.noir.getCircuit();
-      assert.isTrue(await circuit.verifyProofFor({ x: 2, y: 3, result: 6 }));
-    });
-
     it("fails to verify invalid proof", async function () {
       const circuit = this.hre.noir.getCircuit();
       const proof = await circuit.getProof({ x: 2, y: 3, result: 5 });

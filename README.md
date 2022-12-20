@@ -35,8 +35,6 @@ Compiled 1 Solidity file successfully
 Done in 2.59s.
 ```
 
-> :warning: Compilation and contract generation both require `nargo`. Fallback to typescript compilation is pending.
-
 ## Installation
 
 ```bash
@@ -57,10 +55,10 @@ import "hardhat-noir";
 
 ## Tasks
 
-These tasks only run if there are no changes detected so circuit source files, or are invoked with the `--force` flag.
+These tasks only run if there are no changes detected so circuit source files, or are invoked with the `--force` flag. Both tasks will use the WASM libraries, unless the flag `--nargo` is set or `useNargo` is set to true in the config, in which case they will use the `nargo` binary available in the PATH.
 
-- `noir:compile`: Compiles the circuit in the `circuitsPath` using `nargo`.
-- `noir:contract`: Generates a verifier contract for the circuit using `nargo` in Hardhat's contracts folder.
+- `noir:compile`: Compiles the circuit in the `circuitsPath`.
+- `noir:contract`: Generates a verifier contract for the circuit in Hardhat's contracts folder.
 
 > :wink: The solidity pragma of the generated contract is automatically changed from `>=0.6.0 <0.8.0` to `>=0.6.0 <0.9.0` to support the latest versions of solc, since the generated verifier is compatible with the 0.8 releases.
 
@@ -112,6 +110,7 @@ module.exports = {
     circuitsPath: 'circuits',
     mainCircuitName: 'main',
     nargoBin: 'nargo',
+    useNargo: false,
     autoCompile: true,
     autoGenerateContract: true,
   }
@@ -122,5 +121,5 @@ module.exports = {
 
 Ideas for future improvements:
 
-- Support multiple circuits within the same Hardhat project, each on their individual folder
-- Fall back to compilation and verifier generation using node libraries, if nargo is unavailable
+- [ ] Support multiple circuits within the same Hardhat project, each on their individual folder
+- [x] Fall back to compilation and verifier generation using node libraries, if nargo is unavailable
