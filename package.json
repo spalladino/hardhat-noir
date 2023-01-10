@@ -1,6 +1,6 @@
 {
   "name": "hardhat-noir",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Hardhat plugin for Aztec Noir",
   "repository": "github:spalladino/hardhat-noir",
   "author": "Santiago Palladino <spalladino@gmail.com>",
