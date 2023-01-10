@@ -2,7 +2,7 @@
   "name": "hardhat-noir",
   "version": "0.1.0",
   "description": "Hardhat plugin for Aztec Noir",
-  "repository": "github:spalladino/aztec-noir",
+  "repository": "github:spalladino/hardhat-noir",
   "author": "Santiago Palladino <spalladino@gmail.com>",
   "license": "MIT",
   "main": "dist/src/index.js",
