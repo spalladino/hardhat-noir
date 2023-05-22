@@ -1,5 +1,7 @@
 # hardhat-noir
 
+> **⚠️⚠️⚠️ This plugin [does not work](https://github.com/spalladino/hardhat-noir/issues/2) with the latest version of Noir. The recommended way to use Noir + Hardhat today is via the [noir-starter template](https://github.com/noir-lang/noir-starter/tree/main/next-hardhat).**
+
 An unofficial Hardhat plugin for working with circuits written in [Noir](https://github.com/noir-lang/noir). 
 
 Inspired by [vezenovm/basic_mul_noir_example](https://github.com/vezenovm/basic_mul_noir_example/).
